@@ -17,6 +17,7 @@ bash scripts/start.sh
 
 ### Improvements:
 
+- add checks for SOL balance before buys & token balance before sells
 - `confirmed` field in the db
 - logging
 - check for amount of trade against number of decimals is missing
