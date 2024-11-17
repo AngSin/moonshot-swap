@@ -46,7 +46,7 @@ export class SolanaService {
     trader: PublicKey,
     direction: Direction,
   ): Promise<{
-    message: string;
+    transactionMessage: string;
     lastValidBlockHeight: number;
   }> {
     const token = this.moonshot.Token({
@@ -105,7 +105,7 @@ export class SolanaService {
 
     console.log(`Serialized message: ${message}`);
     return {
-      message,
+      transactionMessage: message,
       lastValidBlockHeight,
     };
   }

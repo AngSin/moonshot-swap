@@ -7,7 +7,7 @@ export type OrderDocument = HydratedDocument<Order>;
 @Schema({ collection: 'orders' })
 export class Order {
   @Prop({ type: String, required: true, index: true, unique: true })
-  message: string;
+  transactionMessage: string;
 
   @Prop({ required: true })
   submitted: boolean;

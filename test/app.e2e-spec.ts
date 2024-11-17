@@ -37,9 +37,9 @@ describe('App', () => {
         amount: 10,
       },
     );
-    const { message } = prepareResponse.data;
+    const { transactionMessage } = prepareResponse.data;
     const versionedMessage = VersionedMessage.deserialize(
-      Buffer.from(message, 'base64'),
+      Buffer.from(transactionMessage, 'base64'),
     );
 
     const versionedTransaction = new VersionedTransaction(versionedMessage);

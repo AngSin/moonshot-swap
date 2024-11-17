@@ -20,10 +20,10 @@ export class OrdersService {
     direction: Direction,
     trader: PublicKey,
   ): Promise<Order> {
-    const { message, lastValidBlockHeight } =
+    const { transactionMessage, lastValidBlockHeight } =
       await this.solanaService.prepareTx(token, amount, trader, direction);
     const newOrder = new this.orderModel<Order>({
-      message,
+      transactionMessage: transactionMessage,
       lastValidBlockHeight,
       submitted: false,
       trader: trader.toBase58(),
@@ -89,7 +89,7 @@ export class OrdersService {
     console.log(`Found message: ${message}`);
 
     const existingOrder = await this.orderModel.findOne({
-      message,
+      transactionMessage: message,
     });
 
     if (!existingOrder) {
@@ -107,7 +107,7 @@ export class OrdersService {
     const txHash = await this.solanaService.submitTx(signedTx);
 
     return this.orderModel.findOneAndUpdate(
-      { message },
+      { transactionMessage: message },
       { $set: { submitted: true, signedTx, txHash } },
       { new: true },
     );
