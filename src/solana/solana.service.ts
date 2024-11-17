@@ -58,7 +58,7 @@ export class SolanaService {
     console.log(
       `Found: ${decimals} decimals for token mint account ${mintAccount.toString()}`,
     );
-    const tokenAmount: bigint = BigInt(roughAmount) * BigInt(10 ** decimals);
+    const tokenAmount: bigint = BigInt(roughAmount * 10 ** decimals);
     const orderAmountInLamports = await token.getCollateralAmountByTokens({
       tokenAmount,
       tradeDirection: direction,

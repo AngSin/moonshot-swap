@@ -28,9 +28,6 @@ export class Order {
   amount: number;
 
   @Prop({ required: false })
-  signedTx?: string;
-
-  @Prop({ required: false })
   txHash?: string;
 }
 

@@ -23,3 +23,4 @@ bash scripts/start.sh
 - logging tool
 - copy-pasted moonshot api interactions from sdk example so settings are not fine-tuned
 - handling error if token is not on moonshot bonding curve
+- js number overflow
