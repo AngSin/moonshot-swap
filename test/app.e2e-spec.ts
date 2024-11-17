@@ -18,8 +18,8 @@ const keypair = Keypair.fromSecretKey(new Uint8Array(secretKey));
 
 const connection = new Connection(process.env.RPC_ENDPOINT);
 
-const randomTx =
-  'AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQAHDgzJjMGCAvuIkdMdVKSs06+IM5eqmEb+kK3bLL7DjLY4CF64DjUUPGc5+zeaUywkAO3TcDa+ZDbss9Ekf1OGM8YlyjNh1RpmQRKoWUaqkEhHSp8C47oWNoWyvwDhwjHynK7BxiOk1daerKvQZpw5HhLgGxZ4cl3pkFnIQN6PdRGPKzNTzkZ9+3o7nJcsHTysX6cP2mDMI8PqHnf9KTplXclAEDXTWrtTEl2R6bMAPLi4v0ZWZb8BResLmfiD0dDAGYhf63LbrPKGCqH5Jwvv4S1edz55XXGKksjRxXu2Zqq6AwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAAAFVIpee3hAkTvMh3Rw/HjksvtNF0IY0a7K5eu86kvD2X20I5leKusc6kJuxu4uSnQE7GejxCRx2KCCYJzy5VviHw7zJu409ss59Se6fqsFm/8TXRrQJSEODSV5nGQktjwG3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8AqYyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACJ4qXaW8Rz7dqWI5DkJge1aXqiSasbIgA0Qwm/gQNPwQMHAAkDQA0DAAAAAAAICwABAgMEBQkKCwwNIWYGPRIB2uvqAOH1BQAAAAACAAAAAAAAAAH0AQAAAAAAAA0CAAYMAgAAAAAAAAAAAAAAAA==';
+const randomTxMessage =
+  'gAEABw4MyYzBggL7iJHTHVSkrNOviDOXqphG/pCt2yy+w4y2OAheuA41FDxnOfs3mlMsJADt03A2vmQ27LPRJH9ThjPGJcozYdUaZkESqFlGqpBIR0qfAuO6FjaFsr8A4cIx8pyuwcYjpNXWnqyr0GacOR4S4BsWeHJd6ZBZyEDej3URjyszU85Gfft6O5yXLB08rF+nD9pgzCPD6h53/Sk6ZV3JQBA101q7UxJdkemzADy4uL9GVmW/AUXrC5n4g9HQwBmIX+ty26zyhgqh+ScL7+EtXnc+eV1xipLI0cV7tmaqugMGRm/lIRcy/+ytunLDm+e8jOW7xfcSayxDmzpAAAAABVSKXnt4QJE7zId0cPx45LL7TRdCGNGuyuXrvOpLw9l9tCOZXirrHOpCbsbuLkp0BOxno8QkcdiggmCc8uVb4h8O8ybuNPbLOfUnun6rBZv/E10a0CUhDg0leZxkJLY8Bt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKmMlyWPTiSJ8bs9ECkUjg2DC1oTmdr/EIQEjnvY2+n4WQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAot7sNYvcSm0fJSZ+lYbQDXQeRppSg4c1cRxdumr5es8DBwAJA0ANAwAAAAAACAsAAQIDBAUJCgsMDSFmBj0SAdrr6gDh9QUAAAAAAwAAAAAAAAAB9AEAAAAAAAANAgAGDAIAAAAAAAAAAAAAAAA=';
 
 describe('App', () => {
   it('should respond successfully to a "liveness" test', async () => {
@@ -56,11 +56,31 @@ describe('App', () => {
         signedTx,
       },
     );
-    expect(submitResponse.status).toBe(200);
+    expect(submitResponse.status).toBe(201);
 
     const { txHash } = submitResponse.data;
     const confirmed = await connection.confirmTransaction(txHash, 'confirmed');
     expect(confirmed).toBeTruthy();
     expect(confirmed.value.err).toBeNull();
+  });
+
+  it('should fail with a BAD REQUEST if a random message is signed (order not found)', async () => {
+    const versionedMessage = VersionedMessage.deserialize(
+      Buffer.from(randomTxMessage, 'base64'),
+    );
+
+    const versionedTransaction = new VersionedTransaction(versionedMessage);
+
+    versionedTransaction.sign([keypair]);
+
+    const signedTx = Buffer.from(versionedTransaction.serialize()).toString(
+      'base64',
+    );
+
+    await expect(
+      axios.post('http://localhost:3000/orders/submit', {
+        signedTx,
+      }),
+    ).rejects.toThrow('Request failed with status code 400');
   });
 });
