@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017"
+      - "27017"
+    environment:
+      MONGO_INITDB_DATABASE: orders
+    volumes:
+      - mongodb_data:/data/db
+
+  nestjs_app:
+    image: nestjs-app:latest
+    container_name: nestjs_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NETWORK: ${NETWORK}
+      MONGO_URI: ${MONGO_URI}
+      RPC_ENDPOINT: ${RPC_ENDPOINT}
+    depends_on:
+      - mongodb
+
+volumes:
+  mongodb_data:
