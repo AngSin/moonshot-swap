@@ -49,7 +49,6 @@ describe('App', () => {
     const signedTx = Buffer.from(versionedTransaction.serialize()).toString(
       'base64',
     );
-    console.log(signedTx);
 
     const submitResponse = await axios.post(
       'http://localhost:3000/orders/submit',
@@ -57,11 +56,11 @@ describe('App', () => {
         signedTx,
       },
     );
-
-    console.log(submitResponse.data);
+    expect(submitResponse.status).toBe(200);
 
     const { txHash } = submitResponse.data;
     const confirmed = await connection.confirmTransaction(txHash, 'confirmed');
-    console.log(confirmed);
+    expect(confirmed).toBeTruthy();
+    expect(confirmed.value.err).toBeNull();
   });
 });

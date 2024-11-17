@@ -109,6 +109,7 @@ export class OrdersService {
     return this.orderModel.findOneAndUpdate(
       { message },
       { $set: { submitted: true, signedTx, txHash } },
+      { new: true },
     );
   }
 }
