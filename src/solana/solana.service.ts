@@ -58,11 +58,12 @@ export class SolanaService {
     console.log(
       `Found: ${decimals} decimals for token mint account ${mintAccount.toString()}`,
     );
-    const tokenAmount: bigint = BigInt(roughAmount * 10 ** decimals);
+    const tokenAmount: bigint = BigInt(roughAmount) * BigInt(10 ** decimals);
     const orderAmountInLamports = await token.getCollateralAmountByTokens({
       tokenAmount,
       tradeDirection: direction,
     });
+    console.log(`Total Collateral amount required: ${orderAmountInLamports}`);
     const fees = this.calculateFees(orderAmountInLamports);
     console.log(
       `Will transfer ${fees} lamports in fees to the treasury wallet ${this.treasuryAccount.toString()}`,

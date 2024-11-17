@@ -22,4 +22,3 @@ bash scripts/start.sh
 - check for amount of trade against number of decimals is missing
 - took the compute units calculation from the example
 - handling error if token is not on moonshot bonding curve
-- js number overflow (u64)
