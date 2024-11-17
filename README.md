@@ -18,8 +18,8 @@ bash scripts/start.sh
 ### Improvements:
 
 - add checks for SOL balance before buys & token balance before sells
+- big blocks of un-separated logic, perhaps a new service/util functions are needed for some
 - `confirmed` field in the db
-- logging
-- check for amount of trade against number of decimals is missing
-- took the compute units calculation from the example
+- logging tool
+- copy-pasted moonshot api interactions from sdk example so settings are not fine-tuned
 - handling error if token is not on moonshot bonding curve
