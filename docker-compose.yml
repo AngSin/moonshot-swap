@@ -24,6 +24,7 @@ services:
       NETWORK: ${NETWORK}
       MONGO_URI: ${MONGO_URI}
       RPC_ENDPOINT: ${RPC_ENDPOINT}
+      TREASURY_ACCOUNT: ${TREASURY_ACCOUNT}
     depends_on:
       - mongodb
 

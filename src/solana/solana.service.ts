@@ -17,9 +17,8 @@ export class SolanaService {
   private readonly connection: Connection;
   private readonly moonshot: Moonshot;
   private readonly feeBasisPoints = 100n;
-  private readonly treasuryAccount = new PublicKey(
-    'ABMHApyZu8DfuaGoKoLk4yRHFsvzHwsEsGZXKsJ19FBX',
-  );
+  private readonly treasuryAccount: PublicKey;
+
   constructor(private readonly configService: ConfigService) {
     const rpcUrl = this.configService.get<string>('solana.rpcEndpoint');
     this.connection = new Connection(rpcUrl);
@@ -30,6 +29,9 @@ export class SolanaService {
         solana: { confirmOptions: { commitment: 'confirmed' } },
       },
     });
+    this.treasuryAccount = new PublicKey(
+      this.configService.get<string>('treasuryAccount'),
+    );
   }
 
   private calculateFees(orderAmountInLamports: bigint): bigint {

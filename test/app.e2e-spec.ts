@@ -3,6 +3,7 @@ import { readFileSync } from 'fs';
 import {
   Connection,
   Keypair,
+  PublicKey,
   VersionedMessage,
   VersionedTransaction,
 } from '@solana/web3.js';
@@ -34,7 +35,7 @@ describe('App', () => {
         trader: keypair.publicKey.toString(),
         direction: 'buy',
         token: '9ThH8ayxFCFZqssoZmodgvtbTiBmMoLWUqQhRAP89Y97',
-        amount: 10,
+        amount: 1_000,
       },
     );
     const { transactionMessage } = prepareResponse.data;
@@ -50,6 +51,12 @@ describe('App', () => {
       'base64',
     );
 
+    const treasuryAccount = new PublicKey(process.env.TREASURY_ACCOUNT);
+    const treasuryBalanceBeforeTx = await connection.getBalance(
+      treasuryAccount,
+      'confirmed',
+    );
+
     const submitResponse = await axios.post(
       'http://localhost:3000/orders/submit',
       {
@@ -62,6 +69,12 @@ describe('App', () => {
     const confirmed = await connection.confirmTransaction(txHash, 'confirmed');
     expect(confirmed).toBeTruthy();
     expect(confirmed.value.err).toBeNull();
+
+    const treasuryBalanceAfterTx = await connection.getBalance(
+      treasuryAccount,
+      'confirmed',
+    );
+    expect(treasuryBalanceAfterTx).toBeGreaterThan(treasuryBalanceBeforeTx);
   });
 
   it('should fail with a BAD REQUEST if a random message is signed (order not found)', async () => {
