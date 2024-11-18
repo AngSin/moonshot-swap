@@ -35,6 +35,13 @@ export class OrdersService {
     return await newOrder.save();
   }
 
+  private verifyTransactionUnSubmitted(order: Order) {
+    if (order.submitted) {
+      console.log(`Transaction was submitted before. TxHash: ${order.txHash}`);
+      throw new BadRequestException('Transaction already submitted!');
+    }
+  }
+
   private verifyTransactionSignatures(signedTx: string, trader: string) {
     const signedTransaction = VersionedTransaction.deserialize(
       Buffer.from(signedTx, 'base64'),
@@ -79,6 +86,7 @@ export class OrdersService {
     const blockHeight = await this.solanaService.getBlockHeight();
 
     if (blockHeight > order.lastValidBlockHeight) {
+      console.log('Transaction too old');
       throw new BadRequestException('Transaction expired!');
     }
   }
@@ -93,14 +101,17 @@ export class OrdersService {
     });
 
     if (!existingOrder) {
+      console.log('Order not found!');
       throw new BadRequestException('Order not found');
     }
 
     console.log(`Found order: ${JSON.stringify(existingOrder, null, 2)}`);
 
-    await this.verifyTransactionExpiration(existingOrder);
-
     this.verifyTransactionSignatures(signedTx, existingOrder.trader);
+
+    this.verifyTransactionUnSubmitted(existingOrder);
+
+    await this.verifyTransactionExpiration(existingOrder);
 
     console.log(`Passed all checks, sending signed tx: ${signedTx}`);
 

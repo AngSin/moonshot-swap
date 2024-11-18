@@ -28,7 +28,7 @@ describe('App', () => {
     expect(res.status).toBe(200);
     expect(res.data).toBe('Hello World!');
   });
-  it('should submit a valid tx', async () => {
+  it('should let the user submit a valid tx once', async () => {
     const prepareResponse = await axios.post(
       'http://localhost:3000/orders/prepare',
       {
@@ -75,6 +75,12 @@ describe('App', () => {
       'confirmed',
     );
     expect(treasuryBalanceAfterTx).toBeGreaterThan(treasuryBalanceBeforeTx);
+
+    await expect(
+      axios.post('http://localhost:3000/orders/submit', {
+        signedTx,
+      }),
+    ).rejects.toThrow('Request failed with status code 400');
   });
 
   it('should fail with a BAD REQUEST if a random message is signed (order not found)', async () => {
